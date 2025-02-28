@@ -49,3 +49,41 @@ public:
     }
 };
 ```
+
+### 优化DFS(记忆化搜索)
+通过增加一个数组**memo**,用于标记节点的状态，在递归到访问过的节点时提前返回
+```bash
+
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        // 优化DFS
+
+        int n = nums.size();
+        vector<int> memo(n, 0); // 0: 未访问, 1: 能到终点, -1: 不能到终点
+
+        // 记忆化搜索
+        function<bool(int)> dfs = [&](int i) -> bool {
+            if (i + nums[i] >= n - 1) return true;  // 能到终点
+
+            // 之前访问过该点
+            if (memo[i] != 0) {
+                return memo[i] == 1;    // 直接返回是否能到终点
+            }
+
+            int furthestJump = min(i + nums[i], n - 1);
+            for (int j = i + 1; j <= furthestJump; j++) {
+                if (dfs(j)) {   //  若该分支能到终点
+                    memo[i] = 1;    //  标记为【能到终点】
+                    return true;
+                }
+            }
+            memo[i] = -1; // 标记为【不能到终点】
+            return false;
+        };
+
+        return dfs(0);
+    }
+};
+
+```
