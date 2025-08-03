@@ -274,3 +274,40 @@ public:
 height(p) = max(height(p.left), height(p.right)) + 1
 有了计算节点高度的函数，即可判断二叉树是否平衡。具体做法类似于二叉树的前序遍历，即对于当前遍历到的节点，首先计算左右子树的高度，如果左右子树的高度差是否不超过 1，再分别递归地遍历左右子节点，并判断左子树和右子树是否平衡。这是一个自顶向下的递归的过程。
 
+
+## 39. 组合总和
+给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+### 代码
+```bash
+class Solution {
+public:
+    void dfs(vector<int>& candidates, int target, vector<vector<int>>& ans, vector<int>& combine, int idx){
+        if(idx == candidates.size()){
+            return;
+        }
+        if(target == 0){
+            ans.push_back(combine);
+            return;
+        }
+        dfs(candidates, target, ans, combine, idx + 1);
+        if( target - candidates[idx] >= 0){
+            combine.push_back(candidates[idx]);
+            dfs(candidates, target - candidates[idx], ans, combine, idx);
+            combine.pop_back();
+
+
+        }
+        
+    }
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+            vector<vector<int>> ans;
+            vector<int> combine;
+            dfs(candidates, target, ans, combine, 0);
+            return ans;
+    }
+
+};
+```
+### 思路
+对于这类寻找所有可行解的题，我们都可以尝试用「搜索回溯」的方法来解决。也就是说思路和**组合问题以及子集问题**类似
+回到本题，我们定义递归函数 dfs(target,combine,idx) 表示当前在 candidates 数组的第 idx 位，还剩 target 要组合，已经组合的列表为 combine。递归的终止条件为 target≤0 或者 candidates 数组被全部用完。那么在当前的函数中，每次我们可以选择跳过不用第 idx 个数，即执行 dfs(target,combine,idx+1)。也可以选择使用第 idx 个数，即执行 dfs(target−candidates[idx],combine,idx)，注意到每个数字可以被无限制重复选取，因此搜索的下标仍为 idx。
