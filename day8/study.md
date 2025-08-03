@@ -142,6 +142,7 @@ public:
 
 ```
 ### 思路
+- 剪枝第一步需要进行排序
 - 每一层index固定，把所有可能出现在index的值（从index到nums.size() - 1）都换过来
 - 通过swap(nums[i], nums[index])的值换到当前位
 - 回溯后再换回去
@@ -213,3 +214,43 @@ public:
 | 是否限制长度 | ❌ 没有限制，所有长度的子集都要   | ✅ 限制组合长度为 `k`            |
 | 总数     | $2^n$ 个子集          | $C(n, k)$ 个组合            |
 | 示例输入   | `[1,2,3]` → 输出所有子集 | `n=4, k=2` → 输出长度为 2 的组合 |
+
+## 90.子集II
+给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的 子集（幂集）。
+
+解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
+### 代码
+```bash
+class Solution {
+public:
+    vector<int> t;
+    vector<vector<int>> ans;
+
+    void dfs(bool choosePre, int cur, vector<int> &nums) {
+        if (cur == nums.size()) {
+            ans.push_back(t);
+            return;
+        }
+        dfs(false, cur + 1, nums);
+        if (!choosePre && cur > 0 && nums[cur - 1] == nums[cur]) {
+            return;
+        }
+        t.push_back(nums[cur]);
+        dfs(true, cur + 1, nums);
+        t.pop_back();
+    }
+
+    vector<vector<int>> subsetsWithDup(vector<int> &nums) {
+        sort(nums.begin(), nums.end());
+        dfs(false, 0, nums);
+        return ans;
+    }
+};
+
+
+```
+### 思路
+与子集1问题类似，不同的是：  
+在递归时，若发现没有选择上一个数，且当前数字与上一个数相同，则可以跳过当前生成的子集。
+
+
