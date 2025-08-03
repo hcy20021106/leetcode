@@ -3,7 +3,7 @@
 
 你应当 保留 两个分区中每个节点的初始相对位置。
 ### 代码
-```
+```bash
 /**
 * Definition for singly-linked list.
 * struct ListNode {
@@ -177,3 +177,100 @@ public:
       - 添加子节点： 若 node 的左（右）子节点不为空，则将左（右）子节点加入队列 queue 。
     - 将当前层结果 tmp 添加入 res 。
 - 返回值： 返回打印结果列表 res 即可
+
+## 109. 有序链表转换二叉搜索树
+给定一个单链表的头节点  head ，其中的元素 按升序排序 ，将其转换为 平衡 二叉搜索树。
+### 代码
+```bash
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* getMedian(ListNode* left, ListNode* right){
+        ListNode* fast = left;
+        ListNode* slow = left;
+        while(fast != right && fast->next != right){
+            fast = fast->next;
+            fast = fast->next;
+            slow = slow->next;
+        }
+        return slow;
+    }
+    TreeNode* buildTree(ListNode* left, ListNode* right){
+        if(left == right){
+            return nullptr;
+        }
+        ListNode* mid = getMedian(left, right);
+        TreeNode* root = new TreeNode(mid->val);
+        root->left = buildTree(left, mid);
+        root->right = buildTree(mid->next, right);
+        return root;
+    }
+    TreeNode* sortedListToBST(ListNode* head) {
+        return buildTree(head, nullptr);
+    }
+};
+```
+### 思路
+本题利用了分治的想法，根据中位数的性质，链表中小于中位数的元素个数与大于中位数的元素个数要么相等，要么相差 1。此时，小于中位数的元素组成了左子树，大于中位数的元素组成了右子树，它们分别对应着有序链表中连续的一段。在这之后，我们使用分治的思想，继续递归地对左右子树进行构造，找出对应的中位数作为根节点，以此类推。  
+找出链表中位数节点的方法多种多样，其中较为简单的一种是「快慢指针法」。初始时，快指针 fast 和慢指针 slow 均指向链表的左端点 left。我们将快指针 fast 向右移动两次的同时，将慢指针 slow 向右移动一次，直到快指针到达边界（即快指针到达右端点或快指针的下一个节点是右端点）。此时，慢指针对应的元素就是中位数。
+
+## 110. 平衡二叉树
+给定一个二叉树，判断它是否是 平衡二叉树  
+### 代码
+```bash
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int height(TreeNode* root){
+        if(root == NULL){
+            return 0;
+        }else{
+            return max(height(root->left), height(root->right)) + 1;
+        }
+    }
+    bool isBalanced(TreeNode* root) {
+        if(root == NULL){
+            return true;
+        }
+        else{
+            return abs(height(root->left) - height(root->right)) <=1 && isBalanced(root->left) && isBalanced(root->right);
+        }
+    }
+};
+```
+### 思路
+自顶向下的递归. 
+先计算节点的height，  
+height(p) = max(height(p.left), height(p.right)) + 1
+有了计算节点高度的函数，即可判断二叉树是否平衡。具体做法类似于二叉树的前序遍历，即对于当前遍历到的节点，首先计算左右子树的高度，如果左右子树的高度差是否不超过 1，再分别递归地遍历左右子节点，并判断左子树和右子树是否平衡。这是一个自顶向下的递归的过程。
+
